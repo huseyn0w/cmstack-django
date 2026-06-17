@@ -3,7 +3,7 @@
 An open-source, WordPress-style CMS built on Python/Django — lighter, faster, SEO-first,
 and easy to read, understand, and extend.
 
-> **Status:** Phases 1–3 complete (Foundation, Accounts, Content). See the roadmap below.
+> **Status:** Phases 1–4 complete (Foundation, Accounts, Content, Media). See the roadmap below.
 
 ## Stack
 
@@ -54,6 +54,7 @@ config/            # Django project: settings split (base/dev/prod/test), urls, 
 apps/              # Django apps, one per bounded concern
   accounts/        # custom User, roles (Groups), permissions, allauth + Google
   content/         # posts, pages, categories, tags, revisions, sanitization
+  media/           # media library: uploads, validation, thumbnails
   core/            # landing page + shared bits
 frontend/          # Vite + Tailwind + Alpine source (builds to frontend/dist)
 templates/         # project-level base templates
@@ -120,6 +121,24 @@ previewable by users with `content.change_post` / `content.change_page`.
 > WordPress-style admin panel (dashboard, WYSIWYG editor, media picker, menus, settings)
 > is **Phase 5**. The Django admin here is developer scaffolding, not the final admin UX.
 
+## Media library
+
+The `media` app manages uploads (`apps/media/`):
+
+- **`MediaAsset`** — stores the file plus extracted metadata (MIME type, size, image
+  width/height) and an auto-generated **thumbnail** (Pillow, max 400×400). Metadata and
+  thumbnail are computed on first save.
+- **Upload validation** — allowed types are JPG, PNG, GIF, WebP, PDF, capped at 10 MB.
+  **SVG is rejected by design** (it can carry embedded scripts → stored-XSS risk).
+- **Permission-gated views** — `/library/` (browse grid), `/library/upload/`,
+  `/library/<id>/delete/`, each behind `LoginRequiredMixin` + the matching
+  `media.*_mediaasset` permission. Editors/Admins get full access; Authors can upload but
+  not delete; Contributors have no media access.
+
+Uploaded files live under `MEDIA_ROOT` and are served at `/media/` (by Django in dev, by
+the web server / object storage in production). Interim management is also available in the
+Django admin; the polished picker integrates with the post editor in Phase 5.
+
 ## Configuration
 
 All configuration is via environment variables (see [.env.example](.env.example)); no
@@ -132,7 +151,7 @@ secrets are committed. `DJANGO_SETTINGS_MODULE` selects the settings module
 1. **Foundation** — Docker, Django skeleton, settings split, pytest, ruff/black, Tailwind+Vite ✅
 2. **Accounts** — custom user, roles (Groups), granular permissions, allauth + Google login ✅
 3. **Content** — posts, pages, categories, tags, revisions, server-side sanitized rich text ✅
-4. Media library and uploads
+4. **Media** — media library, validated uploads, Pillow thumbnails, permission-gated ✅
 5. Custom admin panel
 6. Theme system (swappable template sets)
 7. Plugin/extension system (signals + hook registry)

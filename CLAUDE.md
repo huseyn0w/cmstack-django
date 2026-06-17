@@ -64,6 +64,11 @@ code style): https://github.com/huseyn0w/Laravella-CMS
     were cleaned at write time — keep it that way. `publish_post` is a custom
     permission; published querysets via `Model.objects.published()`. Content is
     editable through the interim Django admin until the Phase 5 panel exists.
+  - `apps.media` — media library. `MediaAsset` stores files plus extracted metadata
+    and a Pillow thumbnail (built on first save). Uploads validated in `forms.py`
+    (allowed types in `constants.py`; SVG rejected as an XSS vector). Browse/upload/
+    delete views are permission-gated (`media.*_mediaasset`). Files served at
+    `/media/` (Django in dev, web server in prod).
 - `frontend/` — Vite + Tailwind + Alpine source; builds to `frontend/dist`
   (with `.vite/manifest.json`), wired into templates via `django-vite`.
 - `templates/` — project-level base templates (`base.html`).

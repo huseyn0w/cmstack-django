@@ -31,6 +31,10 @@ if env_file.exists():
 DEBUG = env("DJANGO_DEBUG")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
+# Tell browsers never to MIME-sniff responses — set in every environment so that
+# served uploads (and everything else) carry X-Content-Type-Options: nosniff.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -48,6 +52,7 @@ INSTALLED_APPS = [
     # Local apps
     "apps.accounts",
     "apps.content",
+    "apps.media",
     "apps.core",
 ]
 

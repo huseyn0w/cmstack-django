@@ -1,0 +1,28 @@
+{% extends "public_base.html" %}
+
+{% block title %}Upload media · DjangoPress{% endblock %}
+
+{% block main %}
+<div class="mx-auto max-w-lg">
+  <a href="{% url 'media:library' %}" class="text-sm text-ink/50 hover:text-ink">← Back to library</a>
+  <h1 class="mb-8 mt-4 text-3xl font-semibold tracking-tight text-ink">Upload media</h1>
+
+  <form method="post" enctype="multipart/form-data" class="dp-auth space-y-4">
+    {% csrf_token %}
+    {% for field in form %}
+      <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}
+          <p class="mt-1 text-sm text-accent">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <button type="submit">Upload</button>
+  </form>
+
+  <p class="mt-6 text-xs text-ink/40">
+    Allowed: {{ allowed_types }} · up to {{ max_size }}.
+  </p>
+</div>
+{% endblock %}

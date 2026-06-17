@@ -6,6 +6,9 @@
     <a href="/" class="text-sm font-semibold tracking-[0.2em] text-ink/80">DJANGOPRESS</a>
     <nav class="flex items-center gap-6 text-sm text-ink/60">
       <a class="transition-colors hover:text-ink" href="{% url 'content:post_list' %}">Blog</a>
+      {% if perms.media.view_mediaasset %}
+        <a class="transition-colors hover:text-ink" href="{% url 'media:library' %}">Library</a>
+      {% endif %}
       {% if user.is_authenticated %}
         <form method="post" action="{% url 'account_logout' %}" class="inline">
           {% csrf_token %}
