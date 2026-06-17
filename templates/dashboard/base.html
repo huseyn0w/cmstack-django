@@ -24,6 +24,7 @@
       {% if perms.content.view_tag %}{% include "dashboard/_navlink.html" with key="tags" url="dashboard:tag_list" label="Tags" %}{% endif %}
       {% if perms.media.view_mediaasset %}{% include "dashboard/_navlink.html" with key="media" url="media:library" label="Media" %}{% endif %}
       {% if perms.accounts.manage_users %}{% include "dashboard/_navlink.html" with key="users" url="dashboard:user_list" label="Users" %}{% endif %}
+      {% if perms.accounts.manage_settings %}{% include "dashboard/_navlink.html" with key="appearance" url="dashboard:themes" label="Appearance" %}{% endif %}
       {% if perms.accounts.manage_settings %}{% include "dashboard/_navlink.html" with key="settings" url="dashboard:settings" label="Settings" %}{% endif %}
     </nav>
   </aside>

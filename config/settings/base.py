@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "apps.content",
     "apps.media",
     "apps.dashboard",
+    "apps.themes",
     "apps.core",
 ]
 
@@ -72,11 +73,16 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
+# Themes live here; each is a directory with a theme.json and optional templates/.
+THEMES_DIR = BASE_DIR / "themes"
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
+        # APP_DIRS must be False to specify loaders explicitly. The theme loader
+        # runs first so an active theme can override any project/app template.
+        "APP_DIRS": False,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -84,6 +90,11 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.core.context_processors.site_settings",
+            ],
+            "loaders": [
+                "apps.themes.loaders.ThemeLoader",
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
             ],
         },
     },

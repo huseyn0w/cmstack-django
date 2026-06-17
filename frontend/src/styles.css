@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Default palette (the "default" theme). A theme overrides these variables in
+   its public_base.html to recolor the whole public site. RGB channels, space-
+   separated, so Tailwind's <alpha-value> opacity modifiers keep working. */
+:root {
+  --color-paper: 246 244 239;
+  --color-ink: 26 26 24;
+  --color-accent: 192 73 43;
+}
+
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;

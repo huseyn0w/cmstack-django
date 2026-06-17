@@ -3,7 +3,7 @@
 An open-source, WordPress-style CMS built on Python/Django — lighter, faster, SEO-first,
 and easy to read, understand, and extend.
 
-> **Status:** Phases 1–5 complete (Foundation, Accounts, Content, Media, Admin panel). See the roadmap below.
+> **Status:** Phases 1–6 complete (Foundation, Accounts, Content, Media, Admin, Themes). See the roadmap below.
 
 ## Stack
 
@@ -57,7 +57,9 @@ apps/              # Django apps, one per bounded concern
   content/         # posts, pages, categories, tags, revisions, sanitization
   media/           # media library: uploads, validation, thumbnails
   dashboard/       # custom WordPress-style admin panel (own UI)
+  themes/          # theme registry + runtime template loader
   core/            # landing page, SiteSettings, shared bits
+themes/            # the themes themselves (default, midnight), each a template set
 frontend/          # Vite + Tailwind + Alpine source (builds to frontend/dist)
 templates/         # project-level base templates
 docker/            # entrypoint and container helpers
@@ -164,6 +166,31 @@ The legacy Django admin remains at `/admin/` as a superuser fallback.
 > `docker compose up -d --build --renew-anon-volumes` (or `docker compose down -v` first)
 > so the new assets are picked up. A fresh `docker compose up --build` always works.
 
+## Themes
+
+The public site is rendered through a **swappable theme** resolved at runtime. A theme is
+a directory under `themes/` with a `theme.json` and an optional `templates/` set that
+overrides any project/app template:
+
+```
+themes/
+  default/   theme.json                      # the base look (no overrides needed)
+  midnight/  theme.json  templates/public_base.html   # a dark recolor
+```
+
+- A custom template loader (`apps/themes/loaders.py`) is registered ahead of the
+  filesystem/app loaders, so the **active theme's** templates win. Resolution is dynamic,
+  so switching themes takes effect immediately — no restart.
+- The palette is driven by **CSS variables** (`--color-paper/ink/accent`), so a theme can
+  recolor the whole public site just by overriding those variables in its `public_base.html`
+  — which is exactly what `midnight` does.
+- The active theme is stored on `SiteSettings.active_theme` and changed from the admin under
+  **Appearance** (gated by `accounts.manage_settings`).
+
+To add a theme: create `themes/<slug>/theme.json`, add template overrides under
+`themes/<slug>/templates/`, rebuild the frontend (Tailwind scans `themes/`), and activate it
+in **Dashboard → Appearance**.
+
 ## Configuration
 
 All configuration is via environment variables (see [.env.example](.env.example)); no
@@ -178,7 +205,7 @@ secrets are committed. `DJANGO_SETTINGS_MODULE` selects the settings module
 3. **Content** — posts, pages, categories, tags, revisions, server-side sanitized rich text ✅
 4. **Media** — media library, validated uploads, Pillow thumbnails, permission-gated ✅
 5. **Admin panel** — custom WordPress-style dashboard (own UI), Trix editor, ownership scoping ✅
-6. Theme system (swappable template sets)
+6. **Themes** — swappable template sets resolved at runtime, CSS-variable palette, admin switcher ✅
 7. Plugin/extension system (signals + hook registry)
 8. **SEO/GEO** — Open Graph, JSON-LD entity/service schema, sitemap, robots.txt with
    AI-crawler policy, `llms.txt`, hreflang, multilingual, GEO-optimized page type

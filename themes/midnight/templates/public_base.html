@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% comment %}theme:midnight — overrides the public shell with a dark palette.{% endcomment %}
+
+{% block extra_head %}
+<style>
+  :root {
+    --color-paper: 16 16 20;
+    --color-ink: 237 236 233;
+    --color-accent: 226 124 95;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="flex min-h-full flex-col">
+  <header class="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-8">
+    <a href="/" class="text-sm font-semibold tracking-[0.3em] text-ink/90">{{ site.site_name|upper }}</a>
+    <nav class="flex items-center gap-6 text-sm text-ink/55">
+      <a class="transition-colors hover:text-ink" href="{% url 'content:post_list' %}">Blog</a>
+      {% if perms.accounts.access_admin %}
+        <a class="transition-colors hover:text-ink" href="{% url 'dashboard:home' %}">Dashboard</a>
+      {% endif %}
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'account_logout' %}" class="inline">{% csrf_token %}
+          <button type="submit" class="transition-colors hover:text-ink">Sign out</button>
+        </form>
+      {% else %}
+        <a class="transition-colors hover:text-ink" href="{% url 'account_login' %}">Sign in</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
+    {% block main %}{% endblock %}
+  </main>
+
+  <footer class="mx-auto w-full max-w-5xl px-6 py-12 text-xs text-ink/35">
+    {{ site.site_name }} · Midnight theme
+  </footer>
+</div>
+{% endblock %}

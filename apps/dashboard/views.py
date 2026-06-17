@@ -11,11 +11,13 @@ from django.views.generic import (
     ListView,
     TemplateView,
     UpdateView,
+    View,
 )
 
 from apps.content.models import Category, Page, Post, Status, Tag
 from apps.core.models import SiteSettings
 from apps.media.models import MediaAsset
+from apps.themes import registry as themes
 
 from .forms import CategoryForm, PageForm, PostForm, SiteSettingsForm, TagForm, UserRoleForm
 from .mixins import AdminAccessMixin
@@ -315,6 +317,34 @@ class UserUpdateView(AdminAccessMixin, SectionMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, "User updated.")
         return super().form_valid(form)
+
+
+# --------------------------------------------------------------------------- #
+# Appearance: themes
+# --------------------------------------------------------------------------- #
+class ThemeListView(AdminAccessMixin, SectionMixin, TemplateView):
+    permission_required = ("accounts.access_admin", "accounts.manage_settings")
+    template_name = "dashboard/themes.html"
+    section = "appearance"
+    heading = "Appearance"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["themes"] = themes.get_available_themes()
+        ctx["active_slug"] = themes.get_active_theme_slug()
+        return ctx
+
+
+class ThemeActivateView(AdminAccessMixin, View):
+    permission_required = ("accounts.access_admin", "accounts.manage_settings")
+    http_method_names = ["post"]
+
+    def post(self, request, slug: str):
+        if themes.activate_theme(slug):
+            messages.success(request, f"Theme “{slug}” activated.")
+        else:
+            messages.error(request, "Unknown theme.")
+        return redirect("dashboard:themes")
 
 
 # --------------------------------------------------------------------------- #

@@ -29,6 +29,11 @@ urlpatterns = [
     # Users
     path("users/", views.UserListView.as_view(), name="user_list"),
     path("users/<int:pk>/edit/", views.UserUpdateView.as_view(), name="user_edit"),
+    # Appearance / themes
+    path("appearance/", views.ThemeListView.as_view(), name="themes"),
+    path(
+        "appearance/<slug:slug>/activate/", views.ThemeActivateView.as_view(), name="theme_activate"
+    ),
     # Settings
     path("settings/", views.SettingsView.as_view(), name="settings"),
 ]

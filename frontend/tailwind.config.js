@@ -3,15 +3,17 @@ export default {
   content: [
     "../templates/**/*.html",
     "../apps/**/templates/**/*.html",
+    "../themes/**/*.html",
     "./src/**/*.{js,ts}",
   ],
   theme: {
     extend: {
       colors: {
-        // Warm editorial palette — restrained and expensive-feeling.
-        paper: "#f6f4ef",
-        ink: "#1a1a18",
-        accent: "#c0492b",
+        // Palette is driven by CSS variables (see styles.css :root). A theme can
+        // override those variables to recolor the entire public site at runtime.
+        paper: "rgb(var(--color-paper) / <alpha-value>)",
+        ink: "rgb(var(--color-ink) / <alpha-value>)",
+        accent: "rgb(var(--color-accent) / <alpha-value>)",
       },
       fontFamily: {
         sans: [

@@ -13,6 +13,7 @@ class SiteSettings(models.Model):
     site_name = models.CharField(_("site name"), max_length=100, default="DjangoPress")
     tagline = models.CharField(_("tagline"), max_length=200, blank=True)
     posts_per_page = models.PositiveIntegerField(_("posts per page"), default=10)
+    active_theme = models.SlugField(_("active theme"), max_length=50, default="default")
 
     class Meta:
         verbose_name = _("site settings")

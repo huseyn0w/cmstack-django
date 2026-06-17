@@ -77,6 +77,15 @@ code style): https://github.com/huseyn0w/Laravella-CMS
     their own posts (`PostScopeMixin`); publishing is gated on `content.publish_post`.
   - `apps.core` also holds `SiteSettings` (a cached singleton) exposed to all
     templates as `site` via a context processor.
+  - `apps.themes` — swappable themes resolved at runtime. Themes live in the
+    top-level `themes/<slug>/` (a `theme.json` + optional `templates/`). The
+    `ThemeLoader` (in `OPTIONS.loaders`, ahead of filesystem/app loaders; note
+    `APP_DIRS` is therefore `False`) resolves the active theme's templates first,
+    dynamically per render (no restart to switch). Active theme = `SiteSettings.
+    active_theme`, changed under Dashboard → Appearance (`manage_settings`). The
+    palette is CSS variables (`--color-paper/ink/accent` in `styles.css`), so a
+    theme recolors everything by overriding them in its `public_base.html`.
+    Tailwind scans `themes/` (see `tailwind.config.js` + the Dockerfile COPY).
 
 Frontend assets: changing anything under `frontend/` and rebuilding requires
 `docker compose up -d --build --renew-anon-volumes` (the dev container surfaces the

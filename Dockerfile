@@ -9,9 +9,10 @@ WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm install
 COPY frontend/ ./
-# Tailwind scans ../templates and ../apps, so those must be present at build.
+# Tailwind scans ../templates, ../apps and ../themes, so those must be present.
 COPY templates /app/templates
 COPY apps /app/apps
+COPY themes /app/themes
 RUN npm run build
 
 # --------------------------------------------------------------------------- #
