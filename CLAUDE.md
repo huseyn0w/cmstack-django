@@ -131,7 +131,17 @@ code style): https://github.com/huseyn0w/Laravella-CMS
     that escaping — keep it). Rendered via a separate `{% block seo_jsonld %}` with
     the same dashboard/allauth opt-out. Organization data comes from `SeoSettings`
     (`organization_logo`, `social_profiles` → `sameAs`, validated http(s) in the form).
-    (8.4 sitemap/robots.txt/llms.txt, 8.5 Service page type land here.)
+    **Crawler surface (8.4):** `sitemaps.py` (Post/Page/Static, `i18n=True`+
+    `alternates=True` → hreflang in the sitemap; excludes drafts + `noindex`) at
+    `/sitemap.xml`; dynamic `/robots.txt`, `/llms.txt`, `/llms-full.txt` views
+    (`apps/seo/views.py`, wired at the root in `config/urls.py`, outside i18n).
+    robots.txt disallows private paths and emits an explicit per-bot allow/deny
+    policy for answer-engine crawlers (`constants.AI_CRAWLER_USER_AGENTS`, toggled by
+    `SeoSettings.allow_ai_crawlers`); `discourage_search` short-circuits to
+    `Disallow: /` with no sitemap. llms.txt files capped at `LLMS_MAX_ITEMS`. NOTE:
+    `sitemap.xml` `<loc>` uses the `django.contrib.sites` domain (set the Site to the
+    real domain in prod — Phase 12); robots/llms use the request host.
+    (8.5 Service page type lands here.)
 
 Frontend assets: changing anything under `frontend/` and rebuilding requires
 `docker compose up -d --build --renew-anon-volumes` (the dev container surfaces the

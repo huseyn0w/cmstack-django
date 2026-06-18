@@ -4,9 +4,8 @@ An open-source, WordPress-style CMS built on Python/Django — lighter, faster, 
 and easy to read, understand, and extend.
 
 > **Status:** Phases 1–7 complete (Foundation, Accounts, Content, Media, Admin, Themes, Plugins).
-> Phase 8 (SEO/GEO) in progress — slices 8.1 (multilingual + hreflang), 8.2 (SEO core: meta/OG/Twitter,
-> canonical, robots, per-content SEO fields, SEO settings) and 8.3 (JSON-LD structured data) shipped.
-> See the roadmap below.
+> Phase 8 (SEO/GEO) in progress — slices 8.1 (multilingual + hreflang), 8.2 (SEO core), 8.3 (JSON-LD)
+> and 8.4 (sitemap.xml, AI-crawler robots.txt, llms.txt) shipped. See the roadmap below.
 
 ## Stack
 
@@ -269,8 +268,18 @@ control it per page and site-wide:
   profiles → `sameAs`) is set in Dashboard → SEO. Values are escaped so structured data
   can't be used to inject markup.
 
-`sitemap.xml`, an AI-crawler `robots.txt`, `llms.txt`, and a GEO-optimized Service page
-type follow in the remaining Phase 8 slices.
+- **Crawler & machine-readable surface** — `/sitemap.xml` (published, non-noindex content
+  with hreflang alternates), a dynamic `/robots.txt` that disallows private areas and carries
+  an explicit **allow/deny policy for answer-engine crawlers** (GPTBot, OAI-SearchBot,
+  ClaudeBot, PerplexityBot, Google-Extended, CCBot, …), toggled by **Allow AI crawlers** in
+  Dashboard → SEO, and `/llms.txt` + `/llms-full.txt` — a concise link index and a full-text
+  dump of the site for LLMs to read directly. The **Discourage search engines** switch turns
+  robots.txt into a site-wide `Disallow: /`.
+
+> In production, set the site's domain (Django “Sites” framework / `SITE_ID`) so `sitemap.xml`
+> emits absolute URLs on your real host (covered in the Phase 12 deployment guide).
+
+A GEO-optimized Service page type follows in the final Phase 8 slice.
 
 ## Configuration
 
@@ -293,7 +302,8 @@ secrets are committed. `DJANGO_SETTINGS_MODULE` selects the settings module
    page type (see [SEO & GEO](#seo--geo-generative-engine-optimization)).
    ✅ 8.1 multilingual content (django-parler) + hreflang + language switcher ·
    ✅ 8.2 SEO core (per-content meta/OG/Twitter, canonical, robots, SEO settings) ·
-   ✅ 8.3 JSON-LD (Organization, WebSite, Article, Person, BreadcrumbList)
+   ✅ 8.3 JSON-LD (Organization, WebSite, Article, Person, BreadcrumbList) ·
+   ✅ 8.4 sitemap.xml (hreflang), AI-crawler robots.txt, llms.txt / llms-full.txt
 9. Comments, search, recaptcha spam protection
 10. Public site rendering + the luxury frontend
 11. AI integration — MCP server (FastMCP)

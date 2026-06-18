@@ -4,7 +4,11 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
+
+from apps.seo import views as seo_views
+from apps.seo.sitemaps import sitemaps
 
 # Non-public, non-translated surfaces: the admin/dashboard UI, auth, media files
 # and the language-switch endpoint. These keep stable, prefix-free URLs.
@@ -17,6 +21,11 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("dashboard/", include("apps.dashboard.urls")),
     path("i18n/", include("django.conf.urls.i18n")),
+    # Machine-readable surfaces, served at the root, unprefixed by language.
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
+    path("robots.txt", seo_views.robots_txt, name="robots_txt"),
+    path("llms.txt", seo_views.llms_txt, name="llms_txt"),
+    path("llms-full.txt", seo_views.llms_full_txt, name="llms_full_txt"),
     path("", include("apps.media.urls")),
 ]
 

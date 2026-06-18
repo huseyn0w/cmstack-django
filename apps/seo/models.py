@@ -80,6 +80,14 @@ class SeoSettings(models.Model):
         default=False,
         help_text=_("Adds a site-wide noindex,nofollow. Use for staging sites only."),
     )
+    allow_ai_crawlers = models.BooleanField(
+        _("allow AI answer-engine crawlers"),
+        default=True,
+        help_text=_(
+            "Let GPTBot, ClaudeBot, PerplexityBot, Google-Extended, etc. crawl the site "
+            "(robots.txt). Turn off to ask them not to."
+        ),
+    )
 
     class Meta:
         verbose_name = _("SEO settings")
