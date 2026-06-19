@@ -16,13 +16,30 @@ export default {
         accent: "rgb(var(--color-accent) / <alpha-value>)",
       },
       fontFamily: {
+        // Body text — Geist (clean, developer-native), self-hosted variable font.
         sans: [
+          "Geist Variable",
           "ui-sans-serif",
           "system-ui",
           "-apple-system",
           "Segoe UI",
-          "Inter",
           "sans-serif",
+        ],
+        // Display / headlines — Space Grotesk, a characterful grotesk.
+        display: [
+          "Space Grotesk Variable",
+          "Geist Variable",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+        ],
+        // Code, labels, metadata.
+        mono: [
+          "Geist Mono Variable",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "monospace",
         ],
       },
     },

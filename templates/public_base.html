@@ -2,6 +2,8 @@
 {% load plugin_hooks %}
 
 {% block extra_head %}
+  {# Active theme's palette (CSS variables). Default theme renders nothing. #}
+  {% include "_theme_palette.html" %}
   {% comment %}
     Tell search and answer engines about every language version of this page.
     x-default points crawlers at the default-language URL.
@@ -17,7 +19,7 @@
 {% block body %}
 <div class="flex min-h-full flex-col">
   <header class="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-8">
-    <a href="/" class="text-sm font-semibold tracking-[0.2em] text-ink/80">DJANGOPRESS</a>
+    <a href="/" class="font-display text-sm font-semibold tracking-[0.25em] text-ink transition-colors hover:text-accent">DJANGOPRESS</a>
     <nav class="flex items-center gap-6 text-sm text-ink/60">
       <a class="transition-colors hover:text-ink" href="{% url 'content:service_list' %}">Services</a>
       <a class="transition-colors hover:text-ink" href="{% url 'content:post_list' %}">Blog</a>

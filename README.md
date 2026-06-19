@@ -350,7 +350,9 @@ secrets are committed. `DJANGO_SETTINGS_MODULE` selects the settings module
 9. Comments, search, recaptcha spam protection — ✅ 9.1 threaded moderated comments ·
    ✅ 9.2 site search (Postgres full-text + `icontains` fallback, multilingual, `/search/`) ·
    ✅ 9.3 reCAPTCHA v3 spam protection on the comment form (graceful when unset)
-10. Public site rendering + the luxury frontend
+10. Public site rendering + the luxury frontend — 🚧 10.1 design foundation
+    (self-hosted variable-font type system, scroll-reveal motion primitive,
+    palette-only themes so the shell never drifts)
 11. AI integration — MCP server (FastMCP)
 12. Production deployment (VPS + shared hosting) + demo seed data
 

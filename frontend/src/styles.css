@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Default palette (the "default" theme). A theme overrides these variables in
-   its public_base.html to recolor the whole public site. RGB channels, space-
-   separated, so Tailwind's <alpha-value> opacity modifiers keep working. */
+/* Default palette (the "default" theme). A theme overrides these variables via
+   its _theme_palette.html include to recolor the whole public site. RGB channels,
+   space-separated, so Tailwind's <alpha-value> opacity modifiers keep working. */
 :root {
   --color-paper: 246 244 239;
   --color-ink: 26 26 24;
@@ -15,6 +15,34 @@
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  /* Headlines carry the display grotesk; body inherits Geist (Tailwind sans). */
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+  }
+}
+
+/* Scroll-reveal primitive (raw CSS, kept out of @layer so it is never purged;
+   used by the public marketing pages). Progressive enhancement: the hidden
+   start-state only applies when JS is on (html.js) AND the user has not asked
+   for reduced motion, so no-JS and reduced-motion visitors always see fully
+   rendered content. Alpine's x-intersect toggles .is-visible. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js .reveal {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  html.js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
   }
 }
 

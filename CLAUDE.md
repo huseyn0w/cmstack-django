@@ -100,9 +100,17 @@ code style): https://github.com/huseyn0w/Laravella-CMS
     `APP_DIRS` is therefore `False`) resolves the active theme's templates first,
     dynamically per render (no restart to switch). Active theme = `SiteSettings.
     active_theme`, changed under Dashboard → Appearance (`manage_settings`). The
-    palette is CSS variables (`--color-paper/ink/accent` in `styles.css`), so a
-    theme recolors everything by overriding them in its `public_base.html`.
-    Tailwind scans `themes/` (see `tailwind.config.js` + the Dockerfile COPY).
+    palette is CSS variables (`--color-paper/ink/accent`; default values in
+    `styles.css` `:root`). **A theme recolors the site by overriding ONLY those
+    variables via a `_theme_palette.html` include — it does NOT fork the shell**
+    (Phase 10.1): the shared `templates/public_base.html` does
+    `{% include "_theme_palette.html" %}` in `extra_head`; the active theme's
+    `themes/<slug>/templates/_theme_palette.html` (resolved first by `ThemeLoader`)
+    emits its `<style>:root{…}</style>`, while the default theme ships none so the
+    empty project-level include renders and the `styles.css` default applies. So
+    `themes/midnight` is palette-only (a 6-line file) and automatically inherits
+    every shell change (nav/search/language switcher) — it can't drift. Tailwind
+    scans `themes/` (see `tailwind.config.js` + the Dockerfile COPY).
   - `apps.plugins` — the extension system. `hooks.py` is a small registry of
     actions (`do_action`), filters (`apply_filters`), and region renderers
     (`render_hook`, exposed as the `{% hook %}` template tag). Callbacks are
@@ -196,7 +204,18 @@ NOTE: CSS files imported by a Vite entry (e.g. `admin.css`) must use plain `@app
 rules, NOT `@layer`, unless they include their own `@tailwind` directives.
 - `frontend/` — Vite + Tailwind + Alpine source; builds to `frontend/dist`
   (with `.vite/manifest.json`), wired into templates via `django-vite`.
-- `templates/` — project-level base templates (`base.html`).
+  **Type system (Phase 10.1):** self-hosted variable fonts via Fontsource
+  (`@fontsource-variable/space-grotesk` = `font-display`, `geist` = `font-sans`,
+  `geist-mono` = `font-mono`), imported in `src/main.js`, bundled by Vite (no CDN),
+  `font-display: swap`. Tailwind `fontFamily` maps the three; `h1–h4` get
+  `font-display` via `@layer base`. **Motion:** a self-contained scroll-reveal
+  primitive — add `class="reveal"` to any element and `src/main.js`'s
+  IntersectionObserver fades it in once. Robust by construction: the hidden
+  start-state is raw CSS (never purged) gated on BOTH `html.js` (set by main.js)
+  AND `prefers-reduced-motion: no-preference`, so no-JS and reduced-motion visitors
+  always see fully-rendered content. No per-element directive needed.
+- `templates/` — project-level base templates (`base.html`, `public_base.html`,
+  `_theme_palette.html`).
 - `docker/` — `entrypoint.sh` (waits for DB, migrates, then runs the CMD).
 - `requirements/` — `base.txt`, `dev.txt`, `prod.txt`.
 
