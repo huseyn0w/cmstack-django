@@ -64,8 +64,8 @@
     {% endif %}
 
     {% if comments_require_login and not user.is_authenticated %}
-      <p class="mt-10 rounded-2xl border border-ink/10 bg-white/60 px-5 py-4 text-sm text-ink/60">
-        Please <a class="font-medium text-accent underline-offset-4 hover:underline" href="{% url 'account_login' %}?next={{ request.path }}">sign in</a> to join the discussion.
+      <p class="mt-10 rounded-lg border border-border bg-surface px-5 py-4 text-sm text-text-muted">
+        Please <a class="font-medium text-primary underline-offset-4 hover:underline" href="{% url 'account_login' %}?next={{ request.path }}">sign in</a> to join the discussion.
       </p>
     {% else %}
       <form method="post" action="{{ post.get_absolute_url }}#comments" class="dp-form mt-10 space-y-4">
