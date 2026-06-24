@@ -61,9 +61,11 @@ Non-negotiable, added by the user after the view rule:
   (`Comment.approve()/mark_spam()`, `Post.gate_publish_state()`, `save()` sanitize/slug) are
   legitimate entity behavior, not "raw ORM in a service" — services call these methods rather
   than reimplementing them. Repositories own *queries* and *create/delete* persistence.
-- Services currently fire **no** inline side effects (sanitize/cache/revisions already live in
-  `model.save()` / existing signals), so the observer half is satisfied today; the signal
-  pattern is used as new effects land (F5 comment-notification email is the first).
+- Services fire **no** inline side effects. The first real effect — F5 comment-notification
+  email — is implemented through the mandated pattern: `submit_comment` emits the
+  `comment_created` domain signal (via `send_robust`), and the observer
+  `comments/signals.py::notify_post_author` performs the email. Future effects follow the
+  same shape.
 
 Repository rollout status: ☑ content, comments, core, media, search, **dashboard, accounts,
 seo** — ALL apps done. Verified: `grep` finds zero ORM in any `views.py` and zero raw
@@ -152,7 +154,7 @@ value/risk. Effort: S/M/L from audit.
 | F2 | **Coverage** measured (pytest-cov + `fail_under`) | absent | S | Required to verify Task 4 targets at all. Do early. |
 | F3 | **RSS/Atom** feeds (`/rss.xml`, per-category) | absent | S | `django.contrib.syndication`. Net-new for all 3. |
 | F4 | **Contact form** + email | absent | S–M | copy laravel; reCAPTCHA-graceful; settings-driven recipient. |
-| F5 | **Comment-notification email** | absent | S | notify author/moderators on new comment. |
+| F5 | **Comment-notification email** | ☑ DONE | S | `comment_created` domain signal emitted by `submit_comment`; observer `notify_post_author` in `comments/signals.py` emails the post author (send_robust + fail_silently — never breaks submission). Demonstrates the service→signal→observer rule. 4 tests. |
 | F6 | **Soft-delete/trash/restore** (posts+pages) + **post likes** | absent | M | copy ts: `deleted_at`, manager scoping, trash/restore views; `Like` model + endpoint. |
 | F7 | **Revision restore UI** (storage exists, restore absent) | partial | M | dashboard diff+restore view; net-new for all 3. |
 | F8 | **Scheduled publishing** (`scheduled_at` + worker) | absent | M | management command/cron auto-publishes due content. |

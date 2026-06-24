@@ -14,6 +14,7 @@ from apps.core.repositories import SiteSettingsRepository
 from .forms import CommentForm
 from .models import Comment
 from .repositories import CommentRepository
+from .signals import comment_created
 
 # Submission outcomes returned by ``submit_comment`` (mapped to HTTP by the view).
 CREATED = "created"
@@ -56,7 +57,10 @@ def submit_comment(post, user, data) -> tuple[str, CommentForm | None]:
         comment.email = user.email or ""
     form = CommentForm(data, instance=comment, user=user)
     if form.is_valid():
-        CommentRepository.save_from_form(form)
+        saved = CommentRepository.save_from_form(form)
+        # Side effects run in observers, never inline here. send_robust so a failing
+        # receiver (e.g. mail outage) can't break the submission.
+        comment_created.send_robust(sender=Comment, comment=saved)
         return CREATED, form
     return INVALID, form
 
