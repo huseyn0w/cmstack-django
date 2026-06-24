@@ -178,8 +178,8 @@ off-token badges, no focus ring, ad-hoc cards) traces to the missing token layer
 
 | # | Area | Effort | Work |
 |---|---|---|---|
-| U1 | **Token system** | L | Replace 3 vars with full §2 semantic set on `:root` + `.dark`; bridge into Tailwind `theme.extend`; keep theme palette-override mechanism. Foundation — do first. |
-| U2 | **Fonts** | L | Swap Fontsource → Newsreader (display/prose) + Inter (UI) + Geist Mono; preload 2 critical weights; subset; `font-display:swap`; update Tailwind families + `@layer base` headings; fluid `clamp` type scale + `eyebrow`/`display` tokens. |
+| U1 | **Token system** | L | ☑ DONE — full §2 semantic set on `:root` + `.dark` in `styles.css`; bridged into Tailwind `theme.extend` (`bg`/`surface`/`text-muted`/`primary`/`border`/`ring`/semantic state colors + `highlight`); legacy `paper`/`ink`/`accent` aliased onto new tokens so templates didn't break; midnight theme palette + radius tokens updated; `darkMode:"class"` set. (Remaining: migrate template utilities to semantic names + wire a dark toggle in U3/U4.) |
+| U2 | **Fonts** | L | ☑ DONE — Fontsource swapped to **Newsreader** (display/prose) + **Inter** (UI) + **Geist Mono**; `main.js` imports + Tailwind families + `.dp-prose` serif updated; Vite build verified (main.css 6.7KB gz, main.js 16.7KB gz — within budget). (Remaining: `<link rel=preload>` 2 critical weights + subset → U7 perf.) |
 | U3 | **Public UI** | M | Sticky 64px header + scroll-shadow + mobile drawer (focus-trapped); button variants (md radius, not pills); prose → Newsreader; footer/locale switcher on tokens; skip-to-content link. |
 | U4 | **Admin UI** | M | Sidebar active = surface-2 + 2px primary bar + mono group labels; topbar dark/light toggle + avatar dropdown; messages → semantic Alert/banner. |
 | U5 | **Missing components** | L | Breadcrumbs, dropdown/menu, avatar, file dropzone, sortable list, modals (focus-trap), toasts, alerts, table bulk-select, empty states, conformant badges, rich-text toolbar+aria. |

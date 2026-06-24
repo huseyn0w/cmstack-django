@@ -2,15 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Default palette (the "default" theme). A theme overrides these variables via
-   its _theme_palette.html include to recolor the whole public site. RGB channels,
-   space-separated, so Tailwind's <alpha-value> opacity modifiers keep working. */
+/* Semantic design tokens (DESIGN_SYSTEM §2). RGB channels, space-separated, so
+   Tailwind's <alpha-value> opacity modifiers keep working (`bg-surface/60`).
+   :root = light (default); `.dark` flips them; a theme's _theme_palette.html may
+   re-scope any of these to recolor the whole public site at runtime. */
 :root {
-  --color-paper: 246 244 239;
-  --color-ink: 26 26 24;
-  --color-accent: 192 73 43;
-  /* Strong ease-out: starts fast, feels responsive (vs the weak CSS default). */
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --bg: 251 250 247;
+  --surface: 255 255 255;
+  --surface-2: 244 241 234;
+  --text: 26 26 24;
+  --text-muted: 107 103 96;
+  --text-subtle: 148 144 138;
+  --primary: 178 58 46;
+  --primary-hover: 153 47 37;
+  --primary-contrast: 255 255 255;
+  --accent: 194 104 60;
+  --border: 230 225 215;
+  --border-strong: 210 204 190;
+  --ring: 178 58 46;
+  --success: 47 125 91;
+  --success-bg: 231 241 234;
+  --warning: 169 112 26;
+  --warning-bg: 246 238 221;
+  --error: 180 39 31;
+  --error-bg: 247 231 229;
+
+  /* Motion (DESIGN_SYSTEM §6). Strong ease-out-expo. */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Back-compat aliases for the (few) places that still read the old var names
+     and for theme palette files that set --color-*. Mapped to the new tokens. */
+  --color-paper: var(--bg);
+  --color-ink: var(--text);
+  --color-accent: var(--primary);
+}
+
+.dark {
+  --bg: 15 15 16;
+  --surface: 23 23 26;
+  --surface-2: 32 32 36;
+  --text: 244 242 236;
+  --text-muted: 167 162 154;
+  --text-subtle: 110 106 99;
+  --primary: 224 121 95;
+  --primary-hover: 236 139 114;
+  --primary-contrast: 26 17 16;
+  --accent: 224 160 106;
+  --border: 42 42 46;
+  --border-strong: 58 58 64;
+  --ring: 224 121 95;
+  --success: 95 185 140;
+  --success-bg: 22 39 31;
+  --warning: 214 162 76;
+  --warning-bg: 42 33 19;
+  --error: 232 103 92;
+  --error-bg: 42 21 19;
 }
 
 /* Alpine: hide x-cloak elements until Alpine initializes (and keep them hidden
@@ -147,7 +194,8 @@
    nh3-sanitized HTML whose tags Tailwind can't see at build time). Tuned for the
    warm-paper palette and the Geist body / Space Grotesk heading pairing. */
 .dp-prose {
-  @apply text-lg leading-relaxed text-ink/80;
+  /* Article body uses the editorial serif (Newsreader) per DESIGN_SYSTEM §3. */
+  @apply font-display text-lg leading-relaxed text-ink/80;
 }
 .dp-prose > * + * {
   margin-top: 1.4em;

@@ -215,11 +215,17 @@ rules, NOT `@layer`, unless they include their own `@tailwind` directives.
 
 - `frontend/` — Vite + Tailwind + Alpine source; builds to `frontend/dist`
   (with `.vite/manifest.json`), wired into templates via `django-vite`.
-  **Type system (Phase 10.1):** self-hosted variable fonts via Fontsource
-  (`@fontsource-variable/space-grotesk` = `font-display`, `geist` = `font-sans`,
-  `geist-mono` = `font-mono`), imported in `src/main.js`, bundled by Vite (no CDN),
-  `font-display: swap`. Tailwind `fontFamily` maps the three; `h1–h4` get
-  `font-display` via `@layer base`. **Motion:** a self-contained scroll-reveal
+  **Type system (DESIGN_SYSTEM convergence):** self-hosted variable fonts via
+  Fontsource (`@fontsource-variable/newsreader` = `font-display` serif for
+  headings/prose, `inter` = `font-sans` UI body, `geist-mono` = `font-mono`),
+  imported in `src/main.js`, bundled by Vite (no CDN), `font-display: swap`.
+  Tailwind `fontFamily` maps the three; `h1–h4` + `.dp-prose` get `font-display`.
+  **Design tokens:** the full semantic set (`--bg`/`--surface`/`--surface-2`/
+  `--text`/`--text-muted`/`--text-subtle`/`--primary`/`--accent`/`--border`/
+  `--ring`/state colors) lives on `:root` (light) and `.dark` in `styles.css`,
+  bridged into Tailwind (`bg-surface`, `text-muted`, `border-border`, …);
+  `darkMode:"class"`. Legacy `paper`/`ink`/`accent` utilities are aliased onto the
+  new tokens during the UI migration. Themes re-scope tokens via `_theme_palette.html`. **Motion:** a self-contained scroll-reveal
   primitive — add `class="reveal"` to any element and `src/main.js`'s
   IntersectionObserver fades it in once. Robust by construction: the hidden
   start-state is raw CSS (never purged) gated on BOTH `html.js` (set by main.js)

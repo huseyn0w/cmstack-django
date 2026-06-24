@@ -43,21 +43,28 @@ Layering enforced everywhere: `view → service → repository → manager/Query
   receiver in `apps/comments/signals.py` sends mail; test with locmem backend).
 
 ## PENDING (ordered) — resume here
-1. **Adversarial verification (REQUIRED by prompt §21).** Subagent dispatch was failing with
-   API 529 (overloaded) this session — retry. Dispatch 2–3 independent Opus skeptics per
-   refactored module (lenses: behavior-preservation / security / N+1). Add a regression test
-   for anything they break. Specifically have them probe: comment gating outcome mapping,
-   `editable_by` permission scoping, parler translation saving through the thinned form_valid,
-   N+1 on dashboard lists (`assertNumQueries`).
-2. **Coverage gaps to close:** `apps/content/services.py` 84% (page/service visibility Http404
-   branches, lines ~63-66/71 — add 2 tests); `apps/search/repositories.py` 70% (Postgres FTS
-   branch — needs a Postgres CI job, §F13/F14). Target ≥80% services/managers (met except
-   search-repo Postgres path), 100% critical paths.
-3. **Task 3 — UI convergence (largest remaining).** See REFACTOR_PLAN §3. Order: U1 tokens
-   (3 vars → ~20 semantic + `.dark`), U2 fonts (Space Grotesk/Geist → **Newsreader + Inter +
-   Geist Mono**, preload/subset), U3 public shell, U4 admin shell, U5 missing components, U6
-   a11y, U7 Lighthouse ≥95 (measure for real). Files: `frontend/{tailwind.config.js,src/
-   styles.css,src/main.js,package.json}`, `templates/*`, `apps/*/templates/*`.
+1. ☑ **Adversarial verification — DONE.** 2 independent skeptics (behavior+security;
+   N+1+parler+layering) could not break behavior/security/N+1/translations. One minor finding
+   (services calling `SiteSettings.load()` directly) FIXED in commit ea4ff6a and re-verified.
+2. ◐ **Coverage gaps:** `content/services.py` now 92% (visibility tests added). STILL OPEN:
+   `apps/search/repositories.py` 70% — Postgres FTS branch is SQLite-untestable; needs a
+   Postgres CI job (see §F13/F14).
+3. **Task 3 — UI convergence (largest remaining).** See REFACTOR_PLAN §3.
+   - ☑ U1 tokens DONE: full §2 semantic set + `.dark` in `frontend/src/styles.css`, bridged in
+     `tailwind.config.js` (`darkMode:"class"`); legacy `paper/ink/accent` aliased; midnight
+     theme palette updated to new tokens; radius tokens added.
+   - ☑ U2 fonts DONE: Newsreader + Inter + Geist Mono (package.json/main.js/tailwind/.dp-prose).
+     `cd frontend && npm run build` verified (main.css 6.7KB gz, main.js 16.7KB gz).
+   - ☐ **RESUME HERE → U3 public shell** (sticky 64px header + scroll-shadow + mobile drawer;
+     button variants md-radius not pills; skip-to-content), **U4 admin shell** (sidebar active
+     style, topbar **dark/light toggle** wiring `darkMode:"class"` + localStorage, avatar
+     dropdown, semantic alerts), **U5 components** (breadcrumbs, dropdown, avatar, dropzone,
+     sortable, modals, toasts, table bulk-select, empty states, badges, rich-text toolbar),
+     **U6 a11y** (ARIA pass, focus rings via `--ring`, tabs roles, pagination nav), **U7 perf**
+     (font `<link rel=preload>` 2 weights + subset, Lighthouse ≥95 measured, responsive images).
+   - Migrate template utilities from `paper/ink/accent` → semantic `bg/surface/text/text-muted/
+     primary/border` as you touch each surface, then drop the aliases.
+   - Build after frontend edits: `cd frontend && npm run build` (or docker `--renew-anon-volumes`).
 4. **Task 1 — feature parity (REFACTOR_PLAN §2).** Build through the new layers (view→service→
    repository; effects→signal). Suggested order: F5 comment email (also demos observer), F3
    RSS, F4 contact, F6 soft-delete+likes, F7 revision-restore UI, F8 scheduled publish, F9

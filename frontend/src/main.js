@@ -1,10 +1,11 @@
 import "./styles.css";
 
 // Self-hosted variable fonts (bundled by Vite, served from our own origin — no
-// external CDN, no layout shift). Space Grotesk for display, Geist for body,
-// Geist Mono for code/labels. Wired to Tailwind's font-display/sans/mono.
-import "@fontsource-variable/space-grotesk";
-import "@fontsource-variable/geist";
+// external CDN, no layout shift). Per DESIGN_SYSTEM §3: Newsreader (serif) for
+// display/headings/prose, Inter for UI/body, Geist Mono for metadata/code.
+// Wired to Tailwind's font-display/sans/mono.
+import "@fontsource-variable/newsreader";
+import "@fontsource-variable/inter";
 import "@fontsource-variable/geist-mono";
 
 import Alpine from "alpinejs";
