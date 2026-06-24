@@ -40,6 +40,22 @@
     {% post_content post %}
   </div>
 
+  <div id="likes" class="mt-10 flex items-center gap-3">
+    <form method="post" action="{% url 'content:post_like' post.slug %}">
+      {% csrf_token %}
+      <button type="submit"
+              aria-pressed="{% if user_has_liked %}true{% else %}false{% endif %}"
+              class="dp-btn {% if user_has_liked %}dp-btn-primary{% else %}dp-btn-ghost{% endif %} gap-2 text-sm"
+              aria-label="{% if user_has_liked %}Unlike this post{% else %}Like this post{% endif %}">
+        <span aria-hidden="true">{% if user_has_liked %}♥{% else %}♡{% endif %}</span>
+        <span>{% if user_has_liked %}Liked{% else %}Like{% endif %}</span>
+      </button>
+    </form>
+    <span class="text-sm text-text-muted">
+      {{ likes_count }} like{{ likes_count|pluralize }}
+    </span>
+  </div>
+
   {% if post.tags.all %}
     <footer class="mt-12 flex flex-wrap gap-x-4 gap-y-2 border-t border-ink/10 pt-6">
       {% for tag in post.tags.all %}

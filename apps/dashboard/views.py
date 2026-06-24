@@ -157,14 +157,48 @@ class PostUpdateView(
         return super().form_valid(form)
 
 
-class PostDeleteView(AdminAccessMixin, PostScopeMixin, DeleteView):
+class PostDeleteView(AdminAccessMixin, View):
+    """Soft-delete (trash) a post; restore/permanent-delete live in the trash view."""
+
     permission_required = ("accounts.access_admin", "content.delete_post")
-    success_url = reverse_lazy("dashboard:post_list")
     http_method_names = ["post"]
 
-    def form_valid(self, form):
-        messages.success(self.request, "Post deleted.")
-        return super().form_valid(form)
+    def post(self, request, pk: int):
+        services.trash_post(request.user, pk)
+        messages.success(request, "Post moved to trash.")
+        return redirect("dashboard:post_list")
+
+
+class PostTrashListView(AdminAccessMixin, SectionMixin, ListView):
+    permission_required = ("accounts.access_admin", "content.delete_post")
+    template_name = "dashboard/post_trash.html"
+    context_object_name = "posts"
+    paginate_by = 20
+    section = "posts"
+    heading = "Trash"
+
+    def get_queryset(self):
+        return services.list_trashed_posts(self.request.user)
+
+
+class PostRestoreView(AdminAccessMixin, View):
+    permission_required = ("accounts.access_admin", "content.delete_post")
+    http_method_names = ["post"]
+
+    def post(self, request, pk: int):
+        services.restore_post(request.user, pk)
+        messages.success(request, "Post restored.")
+        return redirect("dashboard:post_trash")
+
+
+class PostDestroyView(AdminAccessMixin, View):
+    permission_required = ("accounts.access_admin", "content.delete_post")
+    http_method_names = ["post"]
+
+    def post(self, request, pk: int):
+        services.permanently_delete_post(request.user, pk)
+        messages.success(request, "Post permanently deleted.")
+        return redirect("dashboard:post_trash")
 
 
 # --------------------------------------------------------------------------- #
@@ -211,11 +245,48 @@ class PageUpdateView(AdminAccessMixin, SectionMixin, DashboardTranslatableFormMi
         return super().form_valid(form)
 
 
-class PageDeleteView(AdminAccessMixin, DeleteView):
+class PageDeleteView(AdminAccessMixin, View):
+    """Soft-delete (trash) a page."""
+
     permission_required = ("accounts.access_admin", "content.delete_page")
-    model = Page
-    success_url = reverse_lazy("dashboard:page_list")
     http_method_names = ["post"]
+
+    def post(self, request, pk: int):
+        services.trash_page(pk)
+        messages.success(request, "Page moved to trash.")
+        return redirect("dashboard:page_list")
+
+
+class PageTrashListView(AdminAccessMixin, SectionMixin, ListView):
+    permission_required = ("accounts.access_admin", "content.delete_page")
+    template_name = "dashboard/page_trash.html"
+    context_object_name = "pages"
+    paginate_by = 20
+    section = "pages"
+    heading = "Trash"
+
+    def get_queryset(self):
+        return services.list_trashed_pages()
+
+
+class PageRestoreView(AdminAccessMixin, View):
+    permission_required = ("accounts.access_admin", "content.delete_page")
+    http_method_names = ["post"]
+
+    def post(self, request, pk: int):
+        services.restore_page(pk)
+        messages.success(request, "Page restored.")
+        return redirect("dashboard:page_trash")
+
+
+class PageDestroyView(AdminAccessMixin, View):
+    permission_required = ("accounts.access_admin", "content.delete_page")
+    http_method_names = ["post"]
+
+    def post(self, request, pk: int):
+        services.permanently_delete_page(pk)
+        messages.success(request, "Page permanently deleted.")
+        return redirect("dashboard:page_trash")
 
 
 # --------------------------------------------------------------------------- #

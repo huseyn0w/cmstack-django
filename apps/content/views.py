@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.views import redirect_to_login
 from django.http import Http404
 from django.shortcuts import redirect
+from django.views import View
 from django.views.generic import DetailView, ListView
 
 from apps.comments import services as comment_services
@@ -80,6 +81,22 @@ class PostDetailView(DetailView):
             )
             return redirect(self.object.get_absolute_url() + "#comments")
         return self.render_to_response(self.get_context_data(comment_form=form))
+
+
+class PostLikeView(View):
+    """Toggle the current user's like on a post (POST only).
+
+    Guests are sent to login; authenticated users toggle and return to the post.
+    """
+
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        post = services.get_post_for_action(self.kwargs["slug"])
+        if not request.user.is_authenticated:
+            return redirect_to_login(post.get_absolute_url())
+        services.toggle_post_like(post, request.user)
+        return redirect(post.get_absolute_url() + "#likes")
 
 
 class PageDetailView(DetailView):

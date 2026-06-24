@@ -12,12 +12,17 @@
       <option value="published" {% if request.GET.status == 'published' %}selected{% endif %}>Published</option>
     </select>
   </form>
-  {% if perms.content.add_post %}
-    <a href="{% url 'dashboard:post_create' %}"
-       class="rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper transition-transform hover:-translate-y-0.5">
-      New post
-    </a>
-  {% endif %}
+  <div class="flex items-center gap-3">
+    {% if perms.content.delete_post %}
+      <a href="{% url 'dashboard:post_trash' %}" class="text-sm text-text-muted hover:text-text">Trash</a>
+    {% endif %}
+    {% if perms.content.add_post %}
+      <a href="{% url 'dashboard:post_create' %}"
+         class="rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper transition-transform hover:-translate-y-0.5">
+        New post
+      </a>
+    {% endif %}
+  </div>
 </div>
 
 <div class="overflow-hidden rounded-2xl border border-ink/10 bg-surface">
@@ -47,9 +52,9 @@
           <td class="px-5 py-3 text-right">
             {% if perms.content.delete_post %}
               <form method="post" action="{% url 'dashboard:post_delete' post.pk %}"
-                    onsubmit="return confirm('Delete this post?')">
+                    onsubmit="return confirm('Move this post to trash?')">
                 {% csrf_token %}
-                <button type="submit" class="text-xs text-ink/40 hover:text-accent">Delete</button>
+                <button type="submit" class="text-xs text-ink/40 hover:text-accent">Trash</button>
               </form>
             {% endif %}
           </td>

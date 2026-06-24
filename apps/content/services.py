@@ -18,6 +18,7 @@ from apps.core.repositories import SiteSettingsRepository
 from .models import Category, Page, Post, Service, Tag
 from .repositories import (
     CategoryRepository,
+    LikeRepository,
     PageRepository,
     PostRepository,
     ServiceRepository,
@@ -94,4 +95,17 @@ def post_detail_context(post: Post, user, comment_form: CommentForm | None = Non
     if site.allow_comments:
         ctx["comments"] = CommentRepository.approved_top_level(post)
         ctx["comment_form"] = comment_form or CommentForm(user=user)
+    ctx["likes_count"] = LikeRepository.count_for(post)
+    ctx["user_has_liked"] = LikeRepository.is_liked_by(post, user)
     return ctx
+
+
+def toggle_post_like(post: Post, user) -> tuple[bool, int]:
+    """Toggle ``user``'s like on ``post``; return (now_liked, total_likes)."""
+    liked = LikeRepository.toggle(post, user)
+    return liked, LikeRepository.count_for(post)
+
+
+def get_post_for_action(slug: str) -> Post:
+    """Fetch a post by slug for a write action (like), or Http404."""
+    return PostRepository.get_by_slug(slug)

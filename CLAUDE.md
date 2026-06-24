@@ -63,6 +63,18 @@ code style): https://github.com/huseyn0w/Laravella-CMS
     (`apps/content/utils.py`); templates render bodies with `|safe` because they
     were cleaned at write time — keep it that way. `publish_post` is a custom
     permission; published querysets via `Model.objects.published()`.
+    **Soft-delete (F6):** Post + Page mix in `SoftDeleteModel` (`deleted_at` +
+    `trash()`/`restore()`/`is_trashed`) and use `SoftDeleteManager`, whose default
+    `get_queryset()` hides trashed rows — so EVERY existing public/admin/search/
+    sitemap/feed query excludes trash with no change; trash views opt back in via
+    `Model.objects.with_trashed()`/`only_trashed()`. The dashboard "delete" now
+    trashes; a Trash list offers restore + permanent-delete (gated on
+    `delete_post`/`delete_page`, owner-scoped through `editable_by`). `trash()`/
+    `restore()` persist only `deleted_at` via `update_fields`, so the heavy `save()`
+    override and the revision-snapshot signal stay no-ops. **Likes (F6):** `Like`
+    (post+user, unique together) is a toggle (create = like, delete = unlike) via
+    `content:post_like` (login-required; guests redirect to login); the post-detail
+    like button is `aria-pressed`-driven and degrades without JS (plain POST form).
     **Multilingual (Phase 8.1, django-parler):** translated fields live on a
     per-model translation table — Post(title/excerpt/body), Page(title/body),
     Category(name/description), Tag(name). `slug`/`status`/`published_at`/`author`/

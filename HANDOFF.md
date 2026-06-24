@@ -4,10 +4,10 @@ _Last refresh: 2026-06-24. Read with [`REFACTOR_PLAN.md`](REFACTOR_PLAN.md),
 [`../FEATURE_MATRIX.md`](../FEATURE_MATRIX.md), [`../DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md)._
 
 ## Current state (verified, not asserted)
-- Full test suite: **250 passed** (`.venv/bin/python -m pytest -q`). Was 218 at start.
-- Lint: `.venv/bin/ruff check apps` → clean.
-- Coverage: **95%** overall (`pytest --cov=apps`). pytest-cov + factory_boy installed and
-  wired (`pyproject.toml [tool.coverage.*]`, `requirements/dev.txt`).
+- Full test suite: **289 passed** (`.venv/bin/python -m pytest -q`). Was 218 at start.
+- Lint: `.venv/bin/ruff check apps config` → clean.
+- Coverage: **~96%** overall (content/dashboard ≥93% each; `pytest --cov=apps`). pytest-cov +
+  factory_boy installed and wired (`pyproject.toml [tool.coverage.*]`, `requirements/dev.txt`).
 - Run app: `docker compose up` (or venv + `manage.py runserver`). Tests: `.venv/bin/python -m
   pytest`. Use `.venv/bin/python` directly — `source .venv/bin/activate` did not expose django
   in this shell, but `.venv/bin/python` works.
@@ -89,8 +89,11 @@ Layering enforced everywhere: `view → service → repository → manager/Query
    - Build after frontend edits: `cd frontend && npm run build` (or docker `--renew-anon-volumes`).
 4. **Task 1 — feature parity (REFACTOR_PLAN §2).** Build through the new layers (view→service→
    repository; effects→signal). ☑ F1 search-services, ☑ F2 coverage, ☑ **F5 comment-email
-   (signal→observer)**, ☑ **F3 RSS**, ☑ **F4 contact form (signal→observer)**. REMAINING order:
-   F6 soft-delete+likes, F7 revision-restore UI, F8 scheduled publish, F9 menus, F10
+   (signal→observer)**, ☑ **F3 RSS**, ☑ **F4 contact form (signal→observer)**, ☑ **F6 soft-
+   delete/trash/restore (posts+pages) + post likes** (`SoftDeleteModel` mixin +
+   `SoftDeleteManager` hiding trash by default; dashboard delete→trash + trash list + restore +
+   permanent-delete; `Like` toggle endpoint + a11y button; 21 tests). REMAINING order:
+   F7 revision-restore UI, F8 scheduled publish, F9 menus, F10
    authors/profile, F11 media picker+storage driver, F12 REST API + MCP (largest), F13 CI,
    F14 E2E, F15 mypy django plugin.
 5. **Task 5 — rewrite README** after the above; align with the other two stacks.
@@ -117,7 +120,7 @@ Layering enforced everywhere: `view → service → repository → manager/Query
 > 2. Read `cmstack-django/HANDOFF.md` and `cmstack-django/REFACTOR_PLAN.md` in full, then
 >    `../FEATURE_MATRIX.md` and `../DESIGN_SYSTEM.md` (read-only canon — never edit the two
 >    shared specs).
-> 3. Confirm the baseline yourself: `.venv/bin/python -m pytest -q` (expect **268 passed**) and
+> 3. Confirm the baseline yourself: `.venv/bin/python -m pytest -q` (expect **289 passed**) and
 >    `.venv/bin/ruff check apps config`. Use `.venv/bin/python` directly — `source .venv/bin/activate`
 >    does NOT expose Django in this shell. Frontend build: `cd frontend && npm run build`.
 >
@@ -143,11 +146,12 @@ Layering enforced everywhere: `view → service → repository → manager/Query
 > email) — all via the signal/observer pattern with tests; UI U1 (semantic tokens + `.dark`),
 > U2 (Newsreader/Inter/Geist Mono fonts), U3 (public shell: sticky header, focus-trap mobile
 > drawer, skip link, buttons, public surfaces on tokens/dark-ready), U4 (admin shell + working
-> dark-mode toggle, all dashboard templates tokenised), and U5/U6 start (breadcrumbs partial +
-> accessible pagination). 268 tests pass, ruff clean, ~95% coverage, Vite build within budget.
+> dark-mode toggle, all dashboard templates tokenised), U5/U6 start (breadcrumbs partial +
+> accessible pagination), and **F6 soft-delete/trash/restore (posts+pages) + post likes**.
+> 289 tests pass, ruff clean, ~96% coverage, Vite build within budget.
 >
-> **RESUME HERE (ordered):** Task 1 feature parity — **F6 soft-delete/trash+restore for
-> posts/pages + post likes**, then F7 revision-restore UI, F8 scheduled publishing, F9 menus,
+> **RESUME HERE (ordered):** Task 1 feature parity — **F7 revision-restore UI**, then
+> F8 scheduled publishing, F9 menus,
 > F10 author pages + self-service profile, F11 media picker + swappable storage driver, F12 REST
 > API + MCP (largest), F13 CI, F14 E2E, F15 wire mypy `django-stubs` plugin. Also finish UI U5
 > (modals replacing `confirm()`, toasts, table bulk-select + backend bulk actions, empty-state

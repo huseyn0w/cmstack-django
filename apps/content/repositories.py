@@ -12,7 +12,7 @@ from __future__ import annotations
 from django.db.models import Count, QuerySet
 from django.shortcuts import get_object_or_404
 
-from .models import Category, Page, Post, Service, Tag
+from .models import Category, Like, Page, Post, Service, Tag
 
 
 class PostRepository:
@@ -70,6 +70,31 @@ class PostRepository:
     def count_all() -> int:
         return Post.objects.count()
 
+    # -- Soft-delete / trash (owner-scoped, mirrors for_dashboard) -- #
+    @staticmethod
+    def get_editable(user, pk: int) -> Post:
+        """A live post ``user`` may manage, or Http404."""
+        return get_object_or_404(Post.objects.editable_by(user), pk=pk)
+
+    @staticmethod
+    def trashed_for_dashboard(user) -> QuerySet:
+        """Trashed posts ``user`` may manage (owner-scoped), newest-deleted first."""
+        return (
+            Post.objects.only_trashed()
+            .editable_by(user)
+            .select_related("author")
+            .order_by("-deleted_at")
+        )
+
+    @staticmethod
+    def get_trashed_editable(user, pk: int) -> Post:
+        """A trashed post ``user`` may manage, or Http404 (restore/destroy target)."""
+        return get_object_or_404(Post.objects.only_trashed().editable_by(user), pk=pk)
+
+    @staticmethod
+    def permanently_delete(post: Post) -> None:
+        post.delete()
+
     @staticmethod
     def published_indexable(limit: int) -> QuerySet:
         """Published, non-noindex posts for crawler surfaces (llms.txt), capped."""
@@ -107,6 +132,24 @@ class PageRepository:
     @staticmethod
     def published_indexable(limit: int) -> QuerySet:
         return Page.objects.published().filter(noindex=False)[:limit]
+
+    # -- Soft-delete / trash (pages have no owner scope) -- #
+    @staticmethod
+    def get_for_admin(pk: int) -> Page:
+        """A live page, or Http404."""
+        return get_object_or_404(Page, pk=pk)
+
+    @staticmethod
+    def trashed_for_admin() -> QuerySet:
+        return Page.objects.only_trashed().select_related("author").order_by("-deleted_at")
+
+    @staticmethod
+    def get_trashed(pk: int) -> Page:
+        return get_object_or_404(Page.objects.only_trashed(), pk=pk)
+
+    @staticmethod
+    def permanently_delete(page: Page) -> None:
+        page.delete()
 
 
 class ServiceRepository:
@@ -153,3 +196,29 @@ class TagRepository:
     @staticmethod
     def with_post_counts() -> QuerySet:
         return Tag.objects.annotate(post_count=Count("posts")).order_by("slug")
+
+
+class LikeRepository:
+    @staticmethod
+    def toggle(post: Post, user) -> bool:
+        """Add or remove ``user``'s like on ``post``; return True if now liked.
+
+        Deleting the row is an unlike, so the relation doubles as a toggle and the
+        unique constraint is never violated.
+        """
+        existing = Like.objects.filter(post=post, user=user).first()
+        if existing is not None:
+            existing.delete()
+            return False
+        Like.objects.create(post=post, user=user)
+        return True
+
+    @staticmethod
+    def count_for(post: Post) -> int:
+        return post.likes.count()
+
+    @staticmethod
+    def is_liked_by(post: Post, user) -> bool:
+        if not getattr(user, "is_authenticated", False):
+            return False
+        return Like.objects.filter(post=post, user=user).exists()

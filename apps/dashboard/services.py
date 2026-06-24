@@ -64,11 +64,45 @@ def prepare_new_post(post, user) -> None:
     post.author = user
 
 
+# -- Trash / restore / permanent-delete (owner-scoped for non-managers) -- #
+def list_trashed_posts(user):
+    return PostRepository.trashed_for_dashboard(user)
+
+
+def trash_post(user, pk: int) -> None:
+    """Soft-delete a post the user may manage (Http404 otherwise)."""
+    PostRepository.get_editable(user, pk).trash()
+
+
+def restore_post(user, pk: int) -> None:
+    PostRepository.get_trashed_editable(user, pk).restore()
+
+
+def permanently_delete_post(user, pk: int) -> None:
+    PostRepository.permanently_delete(PostRepository.get_trashed_editable(user, pk))
+
+
 # --------------------------------------------------------------------------- #
 # Pages / Services
 # --------------------------------------------------------------------------- #
 def list_pages():
     return PageRepository.all_for_admin()
+
+
+def list_trashed_pages():
+    return PageRepository.trashed_for_admin()
+
+
+def trash_page(pk: int) -> None:
+    PageRepository.get_for_admin(pk).trash()
+
+
+def restore_page(pk: int) -> None:
+    PageRepository.get_trashed(pk).restore()
+
+
+def permanently_delete_page(pk: int) -> None:
+    PageRepository.permanently_delete(PageRepository.get_trashed(pk))
 
 
 def list_services():

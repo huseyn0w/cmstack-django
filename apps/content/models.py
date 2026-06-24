@@ -111,7 +111,66 @@ class PublishableQuerySet(TranslatableQuerySet):
 PublishableManager = TranslatableManager.from_queryset(PublishableQuerySet)
 
 
-class Post(SeoFieldsMixin, TranslatableModel, TimeStampedModel):
+class SoftDeleteQuerySet(PublishableQuerySet):
+    """A publishable queryset that also understands soft-deletion."""
+
+    def alive(self) -> models.QuerySet:
+        return self.filter(deleted_at__isnull=True)
+
+    def trashed(self) -> models.QuerySet:
+        return self.filter(deleted_at__isnull=False)
+
+
+_SoftDeleteManagerBase = TranslatableManager.from_queryset(SoftDeleteQuerySet)
+
+
+class SoftDeleteManager(_SoftDeleteManagerBase):
+    """Default manager that hides soft-deleted rows.
+
+    ``Post.objects`` therefore never returns trashed items, so every existing
+    public/admin/search/sitemap/feed query excludes them automatically without
+    change. Trash views opt back in via ``with_trashed()`` / ``only_trashed()``.
+    """
+
+    def get_queryset(self) -> models.QuerySet:
+        return super().get_queryset().alive()
+
+    def with_trashed(self) -> models.QuerySet:
+        return super().get_queryset()
+
+    def only_trashed(self) -> models.QuerySet:
+        return super().get_queryset().trashed()
+
+
+class SoftDeleteModel(models.Model):
+    """Mixin adding a ``deleted_at`` marker plus trash/restore transitions.
+
+    The transitions are entity behaviour (cf. ``Comment.approve``) and persist
+    only the marker via ``update_fields`` so the heavy ``save()`` override and the
+    revision-snapshot signal stay no-ops on a soft-delete.
+    """
+
+    deleted_at = models.DateTimeField(_("deleted at"), null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+    @property
+    def is_trashed(self) -> bool:
+        return self.deleted_at is not None
+
+    def trash(self) -> None:
+        """Soft-delete: hide from the default manager, keep the row + history."""
+        self.deleted_at = timezone.now()
+        self.save(update_fields=["deleted_at", "updated_at"])
+
+    def restore(self) -> None:
+        """Undo a soft-delete, bringing the row back into the default manager."""
+        self.deleted_at = None
+        self.save(update_fields=["deleted_at", "updated_at"])
+
+
+class Post(SeoFieldsMixin, SoftDeleteModel, TranslatableModel, TimeStampedModel):
     translations = TranslatedFields(
         title=models.CharField(_("title"), max_length=200),
         excerpt=models.TextField(_("excerpt"), blank=True),
@@ -143,7 +202,7 @@ class Post(SeoFieldsMixin, TranslatableModel, TimeStampedModel):
     )
     tags = models.ManyToManyField(Tag, verbose_name=_("tags"), blank=True, related_name="posts")
 
-    objects = PublishableManager()
+    objects = SoftDeleteManager()
 
     class Meta:
         verbose_name = _("post")
@@ -209,7 +268,7 @@ class Post(SeoFieldsMixin, TranslatableModel, TimeStampedModel):
             self.status = Status.DRAFT
 
 
-class Page(SeoFieldsMixin, TranslatableModel, TimeStampedModel):
+class Page(SeoFieldsMixin, SoftDeleteModel, TranslatableModel, TimeStampedModel):
     """A standalone, optionally hierarchical page (About, Contact, ...)."""
 
     translations = TranslatedFields(
@@ -243,7 +302,7 @@ class Page(SeoFieldsMixin, TranslatableModel, TimeStampedModel):
         related_name="children",
     )
 
-    objects = PublishableManager()
+    objects = SoftDeleteManager()
 
     class Meta:
         verbose_name = _("page")
@@ -419,3 +478,28 @@ class PostRevision(Revision):
 
 class PageRevision(Revision):
     page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name="revisions")
+
+
+class Like(models.Model):
+    """An authenticated reader's like on a post.
+
+    Identity is the user, so a like is idempotent (one per user per post via the
+    unique constraint) and a guest must sign in first. Deleting a like row is an
+    unlike, so the relation doubles as a toggle.
+    """
+
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="likes"
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("like")
+        verbose_name_plural = _("likes")
+        constraints = [
+            models.UniqueConstraint(fields=["post", "user"], name="unique_post_like_per_user")
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user_id} ♥ {self.post_id}"
