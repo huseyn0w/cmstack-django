@@ -88,10 +88,10 @@ Layering enforced everywhere: `view → service → repository → manager/Query
      primary/border` as you touch each surface, then drop the aliases.
    - Build after frontend edits: `cd frontend && npm run build` (or docker `--renew-anon-volumes`).
 4. **Task 1 — feature parity (REFACTOR_PLAN §2).** Build through the new layers (view→service→
-   repository; effects→signal). Suggested order: F5 comment email (also demos observer), F3
-   RSS, F4 contact, F6 soft-delete+likes, F7 revision-restore UI, F8 scheduled publish, F9
-   menus, F10 authors/profile, F11 media picker+storage driver, F12 REST API + MCP (largest),
-   F13 CI, F14 E2E, F15 mypy django plugin.
+   repository; effects→signal). ☑ F1 search-services, ☑ F2 coverage, ☑ **F5 comment-email
+   (signal→observer)**, ☑ **F3 RSS**. REMAINING order: F4 contact, F6 soft-delete+likes,
+   F7 revision-restore UI, F8 scheduled publish, F9 menus, F10 authors/profile, F11 media
+   picker+storage driver, F12 REST API + MCP (largest), F13 CI, F14 E2E, F15 mypy django plugin.
 5. **Task 5 — rewrite README** after the above; align with the other two stacks.
 6. **Completeness-critic** Opus pass before declaring done (prompt §"production quality bar").
 
