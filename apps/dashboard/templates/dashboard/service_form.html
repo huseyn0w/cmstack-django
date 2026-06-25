@@ -19,6 +19,7 @@
         <label for="{{ form.description.id_for_label }}">Description</label>
         {{ form.description }}
         <trix-editor input="{{ form.description.id_for_label }}"></trix-editor>
+        {% include "dashboard/_media_picker.html" %}
         {% for error in form.description.errors %}<p class="mt-1 text-sm text-accent">{{ error }}</p>{% endfor %}
       </div>
 

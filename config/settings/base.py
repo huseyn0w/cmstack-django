@@ -10,6 +10,8 @@ from pathlib import Path
 
 import environ
 
+from config.storages import build_storages
+
 # config/settings/base.py -> config/settings -> config -> <repo root>
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -264,12 +266,9 @@ STATICFILES_DIRS = [BASE_DIR / "frontend" / "dist"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+# Swappable media storage (local disk by default; S3-compatible when USE_S3_MEDIA
+# is set). The selection logic lives in config.storages so it stays unit-testable.
+STORAGES = build_storages(env)
 
 # --------------------------------------------------------------------------- #
 # django-vite — bridges the Vite build (Tailwind + Alpine) into Django templates.

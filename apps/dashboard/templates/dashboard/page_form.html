@@ -16,6 +16,7 @@
         <label for="{{ form.body.id_for_label }}">Content</label>
         {{ form.body }}
         <trix-editor input="{{ form.body.id_for_label }}"></trix-editor>
+        {% include "dashboard/_media_picker.html" %}
       </div>
 
       <details class="rounded-2xl border border-ink/10 bg-surface p-5" {% if form.meta_title.value or form.meta_description.value or form.canonical_url.value %}open{% endif %}>

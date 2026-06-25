@@ -21,3 +21,8 @@ class MediaRepository:
     @staticmethod
     def count_all() -> int:
         return MediaAsset.objects.count()
+
+    @staticmethod
+    def images(limit: int) -> QuerySet:
+        """Most-recent image assets for the in-editor media picker, capped."""
+        return MediaAsset.objects.filter(mime_type__startswith="image/")[:limit]

@@ -68,6 +68,11 @@ def prepare_new_post(post, user) -> None:
     post.author = user
 
 
+def recent_media_images(limit: int = 60):
+    """Recent image assets for the in-editor media picker."""
+    return MediaRepository.images(limit)
+
+
 # -- Trash / restore / permanent-delete (owner-scoped for non-managers) -- #
 def list_trashed_posts(user):
     return PostRepository.trashed_for_dashboard(user)

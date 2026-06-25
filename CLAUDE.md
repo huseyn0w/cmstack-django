@@ -125,7 +125,18 @@ code style): https://github.com/huseyn0w/Laravella-CMS
     and a Pillow thumbnail (built on first save). Uploads validated in `forms.py`
     (allowed types in `constants.py`; SVG rejected as an XSS vector). Browse/upload/
     delete views are permission-gated (`media.*_mediaasset`). Files served at
-    `/media/` (Django in dev, web server in prod).
+    `/media/` (Django in dev, web server in prod). **In-editor picker (F11):** the
+    post/page/service editors mix in `MediaPickerContextMixin`, which feeds recent
+    library images (`MediaRepository.images`) to a focus-trapped Alpine modal
+    (`dashboard/_media_picker.html`) — shown only to users with
+    `media.view_mediaasset`. Picking an image inserts `<img src alt>` into Trix via
+    `window.cmstackInsertImage` (`frontend/src/admin.js`); nh3 keeps `img` on save.
+    **Swappable storage (F11):** `config.storages.build_storages(env)` builds Django
+    `STORAGES` — local disk by default, or an S3-compatible bucket when
+    `USE_S3_MEDIA=1` (`storages.backends.s3.S3Storage`; `endpoint_url` covers
+    MinIO/R2). Every `FileField`/`ImageField` (media, avatars, OG/featured images)
+    follows the `default` storage, so the swap needs no model change. Optional dep
+    `django-storages[s3]` is in `requirements/prod.txt`.
   - `apps.dashboard` — the custom admin panel (own UI, NOT the
     Django admin), mounted at `/dashboard/`. Every view extends `AdminAccessMixin`
     (login + `accounts.access_admin`) plus a per-view permission tuple. Posts use

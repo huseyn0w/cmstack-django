@@ -4,7 +4,7 @@ _Last refresh: 2026-06-24. Read with [`REFACTOR_PLAN.md`](REFACTOR_PLAN.md),
 [`../FEATURE_MATRIX.md`](../FEATURE_MATRIX.md), [`../DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md)._
 
 ## Current state (verified, not asserted)
-- Full test suite: **331 passed** (`.venv/bin/python -m pytest -q`). Was 218 at start.
+- Full test suite: **337 passed** (`.venv/bin/python -m pytest -q`). Was 218 at start.
 - Lint: `.venv/bin/ruff check apps config` → clean.
 - Coverage: **~96%** overall (content/dashboard ≥93% each; `pytest --cov=apps`). pytest-cov +
   factory_boy installed and wired (`pyproject.toml [tool.coverage.*]`, `requirements/dev.txt`).
@@ -102,8 +102,10 @@ Layering enforced everywhere: `view → service → repository → manager/Query
    fallback, dashboard builder with keyboard up/down reorder; flat + non-translatable label by
    design — see REFACTOR_PLAN §7; 14 tests), ☑ **F10 author public pages + self-service
    profile** (`/authors/<id>/` archive with ProfilePage/Person JSON-LD, email-safe, published-
-   author-gated; `/account/` profile editor; 13 tests). REMAINING order:
-   F11 media picker+storage driver, F12 REST API + MCP (largest), F13 CI,
+   author-gated; `/account/` profile editor; 13 tests), ☑ **F11 in-editor media picker +
+   swappable storage driver** (Alpine modal inserts library images into Trix; `STORAGES` via
+   `config.storages.build_storages(env)` — local↔S3 by env; 9 tests). REMAINING order:
+   F12 REST API + MCP (largest), F13 CI,
    F14 E2E, F15 mypy django plugin.
 5. **Task 5 — rewrite README** after the above; align with the other two stacks.
 6. **Completeness-critic** Opus pass before declaring done (prompt §"production quality bar").
@@ -129,7 +131,7 @@ Layering enforced everywhere: `view → service → repository → manager/Query
 > 2. Read `cmstack-django/HANDOFF.md` and `cmstack-django/REFACTOR_PLAN.md` in full, then
 >    `../FEATURE_MATRIX.md` and `../DESIGN_SYSTEM.md` (read-only canon — never edit the two
 >    shared specs).
-> 3. Confirm the baseline yourself: `.venv/bin/python -m pytest -q` (expect **331 passed**) and
+> 3. Confirm the baseline yourself: `.venv/bin/python -m pytest -q` (expect **337 passed**) and
 >    `.venv/bin/ruff check apps config`. Use `.venv/bin/python` directly — `source .venv/bin/activate`
 >    does NOT expose Django in this shell. Frontend build: `cd frontend && npm run build`.
 >
@@ -160,11 +162,12 @@ Layering enforced everywhere: `view → service → repository → manager/Query
 > **F7 revision-restore UI** (history + diff + restore for posts/pages), **F8 scheduled
 > publishing** (`scheduled_at` + `publish_scheduled` cron command), and **F9 menu builder +
 > public menu rendering** (new `apps.menus`; flat menus, label not per-locale — see §7), and
-> **F10 author public pages + self-service profile** (`/authors/<id>/`, `/account/`).
-> 331 tests pass, ruff clean, ~95% coverage, Vite build within budget.
+> **F10 author public pages + self-service profile** (`/authors/<id>/`, `/account/`), and
+> **F11 in-editor media picker + swappable storage driver** (local↔S3 via `STORAGES`).
+> 337 tests pass, ruff clean, ~95% coverage, Vite build within budget.
 >
-> **RESUME HERE (ordered):** Task 1 feature parity — **F11 media picker in the editor +
-> swappable storage driver (Django STORAGES)**, then
+> **RESUME HERE (ordered):** Task 1 feature parity — **F12 public REST API + MCP server
+> (largest item)**, then
 > F10 author pages + self-service profile, F11 media picker + swappable storage driver, F12 REST
 > API + MCP (largest), F13 CI, F14 E2E, F15 wire mypy `django-stubs` plugin. Also finish UI U5
 > (modals replacing `confirm()`, toasts, table bulk-select + backend bulk actions, empty-state

@@ -64,6 +64,20 @@ class SectionMixin:
         return ctx
 
 
+class MediaPickerContextMixin:
+    """Expose recent library images to a content editor for the in-editor picker.
+
+    Only populated for users who may view media, so the picker stays hidden from
+    those without media access.
+    """
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        if self.request.user.has_perm("media.view_mediaasset"):
+            ctx["media_images"] = services.recent_media_images()
+        return ctx
+
+
 # --------------------------------------------------------------------------- #
 # Dashboard home
 # --------------------------------------------------------------------------- #
@@ -124,7 +138,12 @@ class PublishGatingMixin:
 
 
 class PostCreateView(
-    AdminAccessMixin, SectionMixin, PublishGatingMixin, DashboardTranslatableFormMixin, CreateView
+    AdminAccessMixin,
+    SectionMixin,
+    MediaPickerContextMixin,
+    PublishGatingMixin,
+    DashboardTranslatableFormMixin,
+    CreateView,
 ):
     permission_required = ("accounts.access_admin", "content.add_post")
     model = Post
@@ -143,6 +162,7 @@ class PostCreateView(
 class PostUpdateView(
     AdminAccessMixin,
     SectionMixin,
+    MediaPickerContextMixin,
     PostScopeMixin,
     PublishGatingMixin,
     DashboardTranslatableFormMixin,
@@ -245,7 +265,9 @@ class PageListView(AdminAccessMixin, SectionMixin, ListView):
         return services.list_pages()
 
 
-class PageCreateView(AdminAccessMixin, SectionMixin, DashboardTranslatableFormMixin, CreateView):
+class PageCreateView(
+    AdminAccessMixin, SectionMixin, MediaPickerContextMixin, DashboardTranslatableFormMixin, CreateView
+):
     permission_required = ("accounts.access_admin", "content.add_page")
     model = Page
     form_class = PageForm
@@ -260,7 +282,9 @@ class PageCreateView(AdminAccessMixin, SectionMixin, DashboardTranslatableFormMi
         return super().form_valid(form)
 
 
-class PageUpdateView(AdminAccessMixin, SectionMixin, DashboardTranslatableFormMixin, UpdateView):
+class PageUpdateView(
+    AdminAccessMixin, SectionMixin, MediaPickerContextMixin, DashboardTranslatableFormMixin, UpdateView
+):
     permission_required = ("accounts.access_admin", "content.change_page")
     model = Page
     form_class = PageForm
@@ -359,7 +383,9 @@ class ServiceListView(AdminAccessMixin, SectionMixin, ListView):
         return services.list_services()
 
 
-class ServiceCreateView(AdminAccessMixin, SectionMixin, DashboardTranslatableFormMixin, CreateView):
+class ServiceCreateView(
+    AdminAccessMixin, SectionMixin, MediaPickerContextMixin, DashboardTranslatableFormMixin, CreateView
+):
     permission_required = ("accounts.access_admin", "content.add_service")
     model = Service
     form_class = ServiceForm
@@ -374,7 +400,9 @@ class ServiceCreateView(AdminAccessMixin, SectionMixin, DashboardTranslatableFor
         return super().form_valid(form)
 
 
-class ServiceUpdateView(AdminAccessMixin, SectionMixin, DashboardTranslatableFormMixin, UpdateView):
+class ServiceUpdateView(
+    AdminAccessMixin, SectionMixin, MediaPickerContextMixin, DashboardTranslatableFormMixin, UpdateView
+):
     permission_required = ("accounts.access_admin", "content.change_service")
     model = Service
     form_class = ServiceForm
