@@ -82,7 +82,7 @@ class PostRepository:
         """Trashed posts ``user`` may manage (owner-scoped), newest-deleted first."""
         return (
             Post.objects.only_trashed()
-            .editable_by(user)
+            .editable_by(user)  # type: ignore[attr-defined]  # parler queryset method
             .select_related("author")
             .order_by("-deleted_at")
         )
@@ -90,7 +90,10 @@ class PostRepository:
     @staticmethod
     def get_trashed_editable(user, pk: int) -> Post:
         """A trashed post ``user`` may manage, or Http404 (restore/destroy target)."""
-        return get_object_or_404(Post.objects.only_trashed().editable_by(user), pk=pk)
+        return get_object_or_404(
+            Post.objects.only_trashed().editable_by(user),  # type: ignore[attr-defined]
+            pk=pk,
+        )
 
     @staticmethod
     def permanently_delete(post: Post) -> None:
@@ -234,7 +237,7 @@ class RevisionRepository:
         return post.revisions.select_related("author")
 
     @staticmethod
-    def get_post_revision(post: Post, pk: int):
+    def get_post_revision(post: Post, pk: int | str):
         return get_object_or_404(post.revisions, pk=pk)
 
     @staticmethod
@@ -242,7 +245,7 @@ class RevisionRepository:
         return page.revisions.select_related("author")
 
     @staticmethod
-    def get_page_revision(page: Page, pk: int):
+    def get_page_revision(page: Page, pk: int | str):
         return get_object_or_404(page.revisions, pk=pk)
 
 

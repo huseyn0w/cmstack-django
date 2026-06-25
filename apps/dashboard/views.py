@@ -430,7 +430,8 @@ class ServiceUpdateView(
         return super().form_valid(form)
 
 
-class ServiceDeleteView(AdminAccessMixin, DeleteView):
+# django-stubs flags DeleteView's DeletionMixin/BaseDetailView `object` MRO clash (false positive).
+class ServiceDeleteView(AdminAccessMixin, DeleteView):  # type: ignore[misc]
     permission_required = ("accounts.access_admin", "content.delete_service")
     model = Service
     success_url = reverse_lazy("dashboard:service_list")
@@ -475,7 +476,7 @@ class CategoryUpdateView(
     heading = "Edit category"
 
 
-class CategoryDeleteView(AdminAccessMixin, DeleteView):
+class CategoryDeleteView(AdminAccessMixin, DeleteView):  # type: ignore[misc]
     permission_required = ("accounts.access_admin", "content.delete_category")
     model = Category
     success_url = reverse_lazy("dashboard:category_list")
@@ -513,7 +514,7 @@ class TagUpdateView(AdminAccessMixin, SectionMixin, DashboardTranslatableFormMix
     heading = "Edit tag"
 
 
-class TagDeleteView(AdminAccessMixin, DeleteView):
+class TagDeleteView(AdminAccessMixin, DeleteView):  # type: ignore[misc]
     permission_required = ("accounts.access_admin", "content.delete_tag")
     model = Tag
     success_url = reverse_lazy("dashboard:tag_list")

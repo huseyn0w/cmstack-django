@@ -35,7 +35,8 @@ class MediaUploadView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         return ctx
 
 
-class MediaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+# django-stubs flags DeleteView's DeletionMixin/BaseDetailView `object` MRO clash (false positive).
+class MediaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):  # type: ignore[misc]
     permission_required = "media.delete_mediaasset"
     model = MediaAsset
     success_url = reverse_lazy("media:library")

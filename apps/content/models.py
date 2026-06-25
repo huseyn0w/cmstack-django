@@ -1,3 +1,12 @@
+# django-parler ships no type stubs, so its TranslatableModel / TranslatableManager /
+# TranslatableQuerySet / TranslatedFields all degrade to ``Any`` for mypy. That makes the
+# django-stubs plugin unable to: type the dynamically-injected translated fields such as
+# ``title``/``body`` (has-type), resolve managers built via ``TranslatableManager.from_queryset``
+# (django-manager-missing / valid-type / misc), or reconcile the SchedulableMixin helpers with
+# the concrete CharField / DateTimeField columns (assignment / var-annotated). These are
+# third-party-stub gaps, not real type errors, so they are silenced for this module only —
+# every other module stays fully type-checked.
+# mypy: disable-error-code="has-type, assignment, django-manager-missing, var-annotated, valid-type, misc"
 from __future__ import annotations
 
 from django.conf import settings

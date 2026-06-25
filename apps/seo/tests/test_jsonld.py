@@ -21,7 +21,7 @@ def _ld_nodes(html: str) -> list[dict]:
 
 
 def _types(nodes: list[dict]) -> set[str]:
-    return {n.get("@type") for n in nodes}
+    return {t for n in nodes if (t := n.get("@type"))}
 
 
 @pytest.fixture

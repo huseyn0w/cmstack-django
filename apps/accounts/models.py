@@ -6,7 +6,9 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
-class User(AbstractUser):
+# django-manager-missing: the reverse `services` relation resolves through a
+# parler manager django-stubs can't introspect (django-parler ships no stubs).
+class User(AbstractUser):  # type: ignore[django-manager-missing]
     """
     Cmstack-Django user.
 
@@ -24,7 +26,7 @@ class User(AbstractUser):
     bio = models.TextField(_("bio"), blank=True)
     website = models.URLField(_("website"), blank=True)
 
-    class Meta(AbstractUser.Meta):
+    class Meta(AbstractUser.Meta):  # type: ignore[name-defined]  # django-stubs gap
         permissions = [
             ("access_admin", "Can access the admin dashboard"),
             ("manage_users", "Can manage users and roles"),

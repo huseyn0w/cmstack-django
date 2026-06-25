@@ -70,5 +70,8 @@ exclude_lines = [
 python_version = "3.12"
 ignore_missing_imports = true
 warn_unused_ignores = true
-plugins = []
+plugins = ["mypy_django_plugin.main"]
 exclude = ["migrations", "frontend"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings.test"
