@@ -1,7 +1,24 @@
 # cmstack-django — HANDOFF
 
-_Last refresh: 2026-06-25 (F6–F13 + F15 done; F14 next). Read with [`REFACTOR_PLAN.md`](REFACTOR_PLAN.md),
+_Last refresh: 2026-06-25 (F1–F15 + UI U1–U7 + README all done; only the final
+completeness-critic pass remains). Read with [`REFACTOR_PLAN.md`](REFACTOR_PLAN.md),
 [`../FEATURE_MATRIX.md`](../FEATURE_MATRIX.md), [`../DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md)._
+
+## What changed this session (F13/F14/F15 + U5/U6/U7 + README)
+- **F13 CI**, **F15 mypy** (0 errors, django-stubs), **F14 E2E** (8 Playwright journeys) — see below.
+- **U5**: accessible confirm dialog (replaces 11 `confirm()`), toast notifications,
+  table bulk-select + `PostBulkActionView`→`bulk_trash_posts`→`editable_among`, empty-state
+  component, Trix toolbar aria. **U6**: form-field `aria-invalid`/`aria-describedby` via the
+  `dashboard_a11y.aria_field` filter through `_field.html`; locale tabs `role=tab`/
+  `aria-selected`/`aria-current`. **U7**: hash-free woff2 + `<link rel=preload>` for the two
+  critical latin fonts; darkened `--text-subtle` + migrated low-opacity ink text to semantic
+  tokens to clear WCAG AA. **Lighthouse measured (real headless Chrome, built+Postgres
+  server): home 98/100/96/100, post 100/100/96/100 (perf/a11y/bp/seo) — all ≥95.**
+- **Task 5 README** rewritten (current state, architecture/layering + 5 patterns, testing
+  incl. e2e/lighthouse, CI, i18n, deployment; aligned with the sibling-stack READMEs).
+- Test counts now: **387 unit/integration + 8 e2e**; ruff/black/mypy clean.
+- GOTCHA learned: Django `{# #}` comments are SINGLE-LINE — a multi-line one with a
+  `{% include %}` inside silently self-includes (infinite recursion). Use `{% comment %}`.
 
 ## Current state (verified, not asserted)
 - Full test suite: **379 passed** (`.venv/bin/python -m pytest -q`). Was 218 at start.

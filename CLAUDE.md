@@ -38,7 +38,6 @@ code style): https://github.com/huseyn0w/Laravella-CMS
 
 - Dev up: `docker compose up`
 - Migrate: `docker compose exec web python manage.py migrate`
-- Seed demo data: `docker compose exec web python manage.py seed_demo`
 - Publish scheduled content (cron, e.g. every minute): `python manage.py publish_scheduled`
 - Tests: `docker compose exec web pytest` (single test: `pytest path::test_name`)
 - Lint/format/types: `ruff check .`, `black .`, and `mypy apps config` (django-stubs
