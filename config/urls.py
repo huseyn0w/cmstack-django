@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 
+from apps.api import views as api_views
 from apps.content.feeds import LatestPostsFeed
 from apps.seo import views as seo_views
 from apps.seo.sitemaps import sitemaps
@@ -22,6 +23,11 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("dashboard/", include("apps.dashboard.urls")),
     path("i18n/", include("django.conf.urls.i18n")),
+    # Public REST API (language-agnostic, outside i18n_patterns).
+    path("api/", include("apps.api.urls")),
+    # Liveness + readiness probes.
+    path("health/", api_views.health, name="health"),
+    path("health/ready/", api_views.readiness, name="health_ready"),
     # Machine-readable surfaces, served at the root, unprefixed by language.
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path("rss.xml", LatestPostsFeed(), name="rss"),

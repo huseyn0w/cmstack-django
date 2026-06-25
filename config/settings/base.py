@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "django_recaptcha",
+    "rest_framework",
     # Local apps
     "apps.accounts",
     "apps.content",
@@ -65,6 +66,7 @@ INSTALLED_APPS = [
     "apps.comments",
     "apps.search",
     "apps.menus",
+    "apps.api",
     "apps.core",
     # Plugins (live in the top-level plugins/ directory)
     "plugins.reading_time",
@@ -269,6 +271,18 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Swappable media storage (local disk by default; S3-compatible when USE_S3_MEDIA
 # is set). The selection logic lives in config.storages so it stays unit-testable.
 STORAGES = build_storages(env)
+
+# --------------------------------------------------------------------------- #
+# Django REST Framework (public read API + gated write API)
+# --------------------------------------------------------------------------- #
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    # Read access is public; write/MCP endpoints declare their own auth+permissions.
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
+    "UNAUTHENTICATED_USER": None,
+}
 
 # --------------------------------------------------------------------------- #
 # django-vite — bridges the Vite build (Tailwind + Alpine) into Django templates.

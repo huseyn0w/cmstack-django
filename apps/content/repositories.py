@@ -125,6 +125,14 @@ class PostRepository:
 
 class PageRepository:
     @staticmethod
+    def published() -> QuerySet:
+        return (
+            Page.objects.published()
+            .select_related("author")
+            .order_by("-published_at", "-created_at")
+        )
+
+    @staticmethod
     def get_by_slug(slug: str) -> Page:
         return get_object_or_404(Page, slug=slug)
 
@@ -168,11 +176,11 @@ class PageRepository:
 class ServiceRepository:
     @staticmethod
     def published() -> QuerySet:
-        return Service.objects.published()
+        return Service.objects.published().order_by("-published_at", "-created_at")
 
     @staticmethod
     def recent_published(limit: int) -> QuerySet:
-        return Service.objects.published()[:limit]
+        return ServiceRepository.published()[:limit]
 
     @staticmethod
     def get_by_slug(slug: str) -> Service:
