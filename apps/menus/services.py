@@ -6,7 +6,7 @@ The view/template tag stays at the boundary; all data access goes through
 
 from __future__ import annotations
 
-from .repositories import MenuRepository
+from .repositories import MenuItemRepository, MenuRepository
 
 
 def get_menu_items(slug: str) -> list[dict]:
@@ -26,11 +26,11 @@ def get_menu_items(slug: str) -> list[dict]:
 
 def _node(item) -> dict:
     """Render-ready dict for one item plus its ordered children (one level deep)."""
-    children = sorted(item.children.all(), key=lambda c: (c.position, c.id))
     return {
         "label": item.get_label(),
         "url": item.get_url(),
         "children": [
-            {"label": c.get_label(), "url": c.get_url(), "children": []} for c in children
+            {"label": c.get_label(), "url": c.get_url(), "children": []}
+            for c in MenuItemRepository.children_of(item)
         ],
     }

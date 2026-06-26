@@ -27,12 +27,18 @@ def copy_labels_to_translations(apps, schema_editor):
 
 
 def restore_labels_from_translations(apps, schema_editor):
-    """Reverse: copy the default-language label back onto legacy_label."""
+    """Reverse: copy the default-language label back onto legacy_label.
+
+    Operations reverse last-to-first, so by the time this runs the RemoveField has
+    already re-added the column under its ORIGINAL name ``legacy_label`` (the
+    RenameField that turns it back into ``label`` reverses LAST). Write
+    ``legacy_label`` here, not ``label``.
+    """
     MenuItem = apps.get_model("menus", "MenuItem")
     MenuItemTranslation = apps.get_model("menus", "MenuItemTranslation")
     language = settings.LANGUAGE_CODE
     for translation in MenuItemTranslation.objects.filter(language_code=language):
-        MenuItem.objects.filter(pk=translation.master_id).update(label=translation.label)
+        MenuItem.objects.filter(pk=translation.master_id).update(legacy_label=translation.label)
 
 
 class Migration(migrations.Migration):

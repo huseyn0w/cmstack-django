@@ -69,6 +69,11 @@ class MenuItemRepository:
         return list(menu.items.filter(parent=parent))
 
     @staticmethod
+    def children_of(item: MenuItem) -> list[MenuItem]:
+        """A top-level item's ordered children (served from the prefetch cache)."""
+        return sorted(item.children.all(), key=lambda c: (c.position, c.id))
+
+    @staticmethod
     def next_position(menu: Menu, parent: MenuItem | None = None) -> int:
         """Next position within a sibling group (top level when ``parent`` is None)."""
         last = menu.items.filter(parent=parent).order_by("-position").first()
